@@ -1,33 +1,39 @@
-"use client"
+'use client'
 
 import Button from '../components/Button'
 import GoogleSignInButton from '../components/GoogleSignInButton'
 import TextField from '../components/TextField'
 import SignInOrSignUpButton from '../components/SignInOrSignUp'
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+import ForgotPassword from '../profile/component/ForgotPassword'
+import Drawer from 'react-modern-drawer'
+import 'react-modern-drawer/dist/index.css'
+
 
 const SignInPage = () => {
-  const router = useRouter();
-  const [error, setError] = useState('');
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
+  const router = useRouter()
+  const [error, setError] = useState('')
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
     const result = await signIn('credentials', {
-      redirect: true,
       email: formData.get('email'),
       password: formData.get('password'),
-    });
+      callbackUrl:'/',
+      redirect: true
+    })
 
     if (result?.error) {
-      setError(result.error);
+      setError(result.error)
     } else {
-      router.push('/'); // Redirect after successful login
+      router.push('/') // Redirect after successful login
     }
-  };
+  }
 
   return (
     <section className='flex min-h-full overflow-hidden pt-16 sm:py-28'>
@@ -73,11 +79,34 @@ const SignInPage = () => {
             or
           </div>
           <div className='flex flex-col gap-4'>
-            <SignInOrSignUpButton show={"signup"} />
+            <Button
+              type='submit'
+              variant='outline'
+              color='gray'
+              className='mt-3 w-full'
+              onClick={() => {
+                setShowForgotPassword(true)
+              }}
+            >
+              Forgot Password
+            </Button>
+            <SignInOrSignUpButton show={'signup'} />
             <GoogleSignInButton />
           </div>
         </div>
       </div>
+
+      {showForgotPassword && (
+        <Drawer
+          open={showForgotPassword}
+          onClose={() => setShowForgotPassword(false)}
+          direction='right'
+          size={450}
+          className='flex items-center justify-center'
+        >
+          <ForgotPassword hideForgotPass={() => setShowForgotPassword(false)} />
+        </Drawer>
+      )}
     </section>
   )
 }

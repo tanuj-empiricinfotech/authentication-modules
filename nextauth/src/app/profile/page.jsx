@@ -1,6 +1,8 @@
+
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { authOptions } from '../api/auth/[...nextauth]/route'
+import Profile from './component/Profile'
 
 const Page = async () => {
   const session = await getServerSession(authOptions)
@@ -9,13 +11,19 @@ const Page = async () => {
     redirect('/signin?callbackUrl=/profile')
   }
 
+  const { user } = session;
+
   return (
-    <section className='py-24'>
-      <div className='container'>
-        <h1 className='text-2xl font-bold'>Profile</h1>
-      </div>
-    </section>
-  )
+    <Profile 
+      initialUser={{
+        name: user?.name,
+        email: user?.email,
+        image: user?.image,
+        id: user?.id,
+        createdAt: user?.createdAt || new Date().toISOString()
+      }} 
+    />
+  );
 }
 
-export default Page
+export default Page;
