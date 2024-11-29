@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  provider: {
+    type: String,
+    enum: ['credentials', 'google', 'github'],
+    default: 'credentials'
+  },
   role: {
     type: String,
     enum: ['user', 'admin', 'moderator'], // Add any roles you need
@@ -26,5 +31,5 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const User = mongoose.models?.User || mongoose.model('User', userSchema);
 export default User;

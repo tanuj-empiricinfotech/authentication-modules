@@ -29,7 +29,7 @@ const SignInButton = () => {
             </Link>
           )
         } 
-        <Menu as='div' className='relative'>
+        <Menu as='div' className='relative z-50'>
           <Menu.Button>
             {session?.user?.image ? (
               <div className='relative h-10 w-10'>
@@ -60,7 +60,7 @@ const SignInButton = () => {
             leaveFrom='transform scale-100 opacity-100'
             leaveTo='transform scale-95 opacity-0'
           >
-            <Menu.Items className='bg-react dark:text-react absolute right-0 mt-1 flex w-96 origin-top-right flex-col rounded-xl py-6 text-white shadow-lg focus:outline-none dark:bg-white'>
+            <Menu.Items className='bg-white dark:text-react absolute right-0 mt-1 flex w-96 origin-top-right flex-col rounded-xl py-6 text-white shadow-lg focus:outline-none dark:bg-white'>
               <div className='mb-4 flex gap-4 px-6 text-sm'>
                 {session?.user?.image ? (
                   <div className='relative h-10 w-10'>
@@ -95,10 +95,10 @@ const SignInButton = () => {
                     href='/profile'
                     className={clsx(
                       active && 'bg-stone-700/50 dark:bg-stone-200',
-                      'inline-flex items-center gap-6 px-[34px] py-2 text-sm text-stone-400 dark:text-stone-500'
+                      'inline-flex items-center gap-6 px-[34px] py-2 text-sm text-stone-400 dark:text-stone-500 hover:text-white'
                     )}
                   >
-                    <Cog8ToothIcon className='h-5 w-5 text-stone-400' />
+                    <Cog8ToothIcon className='h-5 w-5' />
                     <span>Manage Account</span>
                   </Link>
                 )}
@@ -108,11 +108,11 @@ const SignInButton = () => {
                   <button
                     className={clsx(
                       active && 'bg-stone-700/50 dark:bg-stone-200',
-                      'inline-flex items-center gap-6 px-[34px] py-2 text-sm text-stone-400 dark:text-stone-500'
+                      'inline-flex items-center gap-6 px-[34px] py-2 text-sm text-stone-400 dark:text-stone-500 hover:text-white'
                     )}
                     onClick={() => signOut()}
                   >
-                    <ArrowRightOnRectangleIcon className='h-5 w-5 text-stone-400' />
+                    <ArrowRightOnRectangleIcon className='h-5 w-5' />
                     <span>Sign Out</span>
                   </button>
                 )}

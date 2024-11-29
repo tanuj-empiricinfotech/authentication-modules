@@ -1,11 +1,10 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '../../../../lib/mongodb';
 import User from '../../../../model/user';
-// import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
-// import clientPromise from '../../../../lib/mongodbadapter';
 
 export const authOptions = {
   providers: [
@@ -18,6 +17,33 @@ export const authOptions = {
           access_type: "offline",
           scope: "openid email profile"
         }
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          provider: 'google'
+        };
+      }
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: "read:user user:email"
+        }
+      },
+      profile(profile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name,
+          email: profile.email,
+          image: profile.avatar_url,
+          provider: 'github'
+        };
       }
     }),
     CredentialsProvider({
@@ -45,6 +71,8 @@ export const authOptions = {
             id: user._id.toString(),
             name: user.name,
             email: user.email,
+            role: user.role,
+            provider: user.provider || 'credentials'
           };
         } catch (error) {
           throw new Error(error.message);
@@ -52,15 +80,14 @@ export const authOptions = {
       }
     })
   ],
-  // Remove the MongoDB adapter temporarily to debug the issue
-  // adapter: MongoDBAdapter(clientPromise),
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account.provider === 'google') {
+      // Handle sign-in for OAuth providers (Google and GitHub)
+      if (['google', 'github'].includes(account.provider)) {
         try {
           await dbConnect();
           
@@ -68,19 +95,27 @@ export const authOptions = {
           const userCount = await User.countDocuments();
           const isFirstUser = userCount === 0;
           
-          const existingUser = await User.findOne({ email: user.email });
+          let existingUser = await User.findOne({ email: user.email || profile.email });
           
           if (existingUser) {
+            // Update provider if not already set
+            if (!existingUser.provider) {
+              existingUser.provider = account.provider;
+              await existingUser.save();
+            }
             return true;
           }
+
+          console.log('account provider', account.provider)
           
           // Create new user, set as admin if first user
           const newUser = await User.create({
-            name: user.name,
-            email: user.email,
-            role: isFirstUser ? 'admin' : 'user'
+            name: user.name || profile.name,
+            email: user.email || profile.email,
+            role: isFirstUser ? 'admin' : 'user',
+            provider: account.provider // Explicitly store the provider
           });
-          
+          console.log('newUser', newUser)
           return true;
         } catch (error) {
           console.error("Error in signIn callback:", error);
@@ -93,27 +128,23 @@ export const authOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        // Add user role to token
+        token.provider = user.provider || account?.provider || 'credentials';
+        
+        // Fetch user from DB to ensure we have the most up-to-date information
         const dbUser = await User.findOne({ email: user.email });
         if (dbUser) {
           token.role = dbUser.role;
+          token.provider = dbUser.provider || token.provider;
         }
       }
       return token;
     },
-
-    async redirect({ url, baseUrl }) {
-      // // Get user from database
-      // const user = await User.findOne({ email: session.user.email });
-      
-      // // Redirect based on user role
-      // if (user.role === 'admin') return '/admin-dashboard'
-      return '/'
-    },
+    
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role; // Add role to session
+        session.user.provider = token.provider; // Add provider to session
       }
       return session;
     }

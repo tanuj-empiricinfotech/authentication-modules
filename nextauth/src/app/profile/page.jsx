@@ -13,6 +13,8 @@ const Page = async () => {
 
   const { user } = session;
 
+  console.log('user', user)
+
   return (
     <Profile 
       initialUser={{
@@ -20,6 +22,7 @@ const Page = async () => {
         email: user?.email,
         image: user?.image,
         id: user?.id,
+        provider : user?.provider,
         createdAt: user?.createdAt || new Date().toISOString()
       }} 
     />

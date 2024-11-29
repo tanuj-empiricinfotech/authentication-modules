@@ -6,7 +6,7 @@ import { generateResetToken } from './generateResetToken';
 export async function sendPasswordResetEmail(email) {
   try {
     // Create a reset token
-    const resetToken = generateResetToken();
+    const resetToken = generateResetToken(email);
 
     // Save the token and email to your database for verification later
     console.log(`Generated reset token for ${email}: ${resetToken}`);
@@ -43,9 +43,10 @@ export async function sendPasswordResetEmail(email) {
 
     // Send the email
     await transporter.sendMail(mailOptions);
-    console.log(`Password reset email sent to ${email}`);
+    return {status : true, message : `Password reset email sent to ${email}`};
   } catch (error) {
     console.error('Error sending password reset email:', error);
-    throw new Error('Failed to send password reset email');
+    return {status : false, message : `Failed to send password reset email`};
+
   }
 }

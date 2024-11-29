@@ -6,6 +6,7 @@ import Drawer from 'react-modern-drawer'
 import 'react-modern-drawer/dist/index.css'
 import Image from 'next/image'
 import ForgotPassword from './ForgotPassword'
+import { useRouter } from 'next/navigation'
 
 const Profile = ({ initialUser }) => {
   const [isPassChange, setIsPassChange] = useState(false)
@@ -18,6 +19,7 @@ const Profile = ({ initialUser }) => {
   })
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const router = useRouter()
 
   function toggleDrawerPassword() {
     setIsPassChange(!isPassChange)
@@ -59,7 +61,7 @@ const Profile = ({ initialUser }) => {
         setTimeout(() => {
           toggleDrawerPassword()
           setSuccess(null)
-        }, 2000)
+        }, 1000)
       } else {
         setError(result.message || 'Failed to change password')
       }
@@ -74,7 +76,10 @@ const Profile = ({ initialUser }) => {
         <div className='flex h-full w-full flex-col items-center lg:h-full lg:items-center lg:justify-normal'>
           <div className='h-[20%] w-full p-3 lg:h-auto'>
             <div
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => {
+                router.back()
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
               className='w-fit cursor-pointer rounded-xl px-4 py-2 transition-all duration-300 ease-in-out hover:bg-gray-100 active:scale-90 active:bg-stone-200 active:duration-100'
             >
               <FaArrowLeftLong size={'36px'} className='text-stone-500' />
@@ -82,7 +87,7 @@ const Profile = ({ initialUser }) => {
           </div>
 
           <div className='flex w-full flex-col justify-around md:flex-row'>
-            <div className='relative flex h-[80%] w-full lg:w-fit flex-col items-center justify-center rounded-full lg:h-auto'>
+            <div className='relative flex h-[80%] w-full flex-col items-center justify-center rounded-full lg:h-auto lg:w-fit'>
               {initialUser?.image ? (
                 <div className='relative h-[200px] w-[200px]'>
                   <Image
@@ -134,137 +139,141 @@ const Profile = ({ initialUser }) => {
                   </h1>
                 </fieldset>
 
-                <Drawer
-                  open={isPassChange}
-                  onClose={toggleDrawerPassword}
-                  direction='right'
-                  size={450}
-                  className='flex items-center'
-                >
-                  {!showForgotPass ? (
-                    <div className='flex h-full w-full items-center justify-center p-6'>
-                      <div className='w-full rounded-xl bg-white px-6 py-5'>
-                        {error && (
-                          <div className='mb-4 rounded bg-red-100 p-3 text-red-700'>
-                            {error}
+                {initialUser.provider === 'credentials' && (
+                  <>
+                    <Drawer
+                      open={isPassChange}
+                      onClose={toggleDrawerPassword}
+                      direction='right'
+                      size={450}
+                      className='flex items-center justify-center'
+                    >
+                      {!showForgotPass ? (
+                        <div className='flex h-full w-full items-center justify-center p-6'>
+                          <div className='w-full rounded-xl bg-white px-6 py-5'>
+                            {error && (
+                              <div className='mb-4 rounded bg-red-100 p-3 text-red-700'>
+                                {error}
+                              </div>
+                            )}
+                            {success && (
+                              <div className='mb-4 rounded bg-green-100 p-3 text-green-700'>
+                                {success}
+                              </div>
+                            )}
+
+                            <label
+                              htmlFor='oldpassword'
+                              className='font-Nova mb-2 mt-4 text-[20px] font-bold capitalize text-gray-600'
+                            >
+                              Enter your old password
+                            </label>
+
+                            <div className='relative flex w-full items-center gap-2 rounded-[5px] border-[2px] border-black bg-transparent px-3'>
+                              <input
+                                onChange={handlePasswordChange}
+                                className='w-full border-none bg-transparent py-2 focus:outline-0 focus:ring-0'
+                                type={viewOldPassword ? 'text' : 'password'}
+                                name='oldPassword'
+                                id='oldpassword'
+                                value={passwordData.oldPassword}
+                              />
+                              {viewOldPassword ? (
+                                <FiEye
+                                  aria-label='Show Old Password'
+                                  className='cursor-pointer text-xl'
+                                  onClick={() => setViewOldPassword(false)}
+                                />
+                              ) : (
+                                <FiEyeOff
+                                  aria-label='Hide Old Password'
+                                  className='cursor-pointer text-xl'
+                                  onClick={() => setViewOldPassword(true)}
+                                />
+                              )}
+                            </div>
+
+                            <label
+                              htmlFor='newpassword'
+                              className='font-Nova mb-2 mt-4 text-[20px] font-bold capitalize text-gray-600'
+                            >
+                              Create new password
+                            </label>
+
+                            <div className='relative flex w-full items-center gap-2 rounded-[5px] border-[2px] border-black bg-transparent px-3'>
+                              <input
+                                onChange={handlePasswordChange}
+                                className='w-full border-none bg-transparent py-2 focus:outline-0 focus:ring-0'
+                                type={viewNewPassword ? 'text' : 'password'}
+                                name='newPassword'
+                                id='newpassword'
+                                value={passwordData.newPassword}
+                              />
+                              {viewNewPassword ? (
+                                <FiEye
+                                  aria-label='Show New Password'
+                                  className='cursor-pointer text-xl'
+                                  onClick={() => setViewNewPassword(false)}
+                                />
+                              ) : (
+                                <FiEyeOff
+                                  aria-label='Hide New Password'
+                                  className='cursor-pointer text-xl'
+                                  onClick={() => setViewNewPassword(true)}
+                                />
+                              )}
+                            </div>
+
+                            <div className='mt-2 flex w-full justify-end pl-1'>
+                              <p
+                                type='button'
+                                onClick={() => {
+                                  setshowForgotPass(true)
+                                }}
+                                className='cursor-pointer text-lg font-semibold text-[#1877f2] hover:underline'
+                              >
+                                Forgotten password?
+                              </p>
+                            </div>
+
+                            <div className='mt-6 flex w-full items-center gap-5'>
+                              <button
+                                onClick={handlePasswordSubmit}
+                                className='rounded bg-black px-4 py-2 text-white transition-colors hover:bg-gray-800'
+                              >
+                                Submit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setPasswordData({
+                                    oldPassword: '',
+                                    newPassword: ''
+                                  })
+                                  toggleDrawerPassword()
+                                }}
+                                className='rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600'
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           </div>
-                        )}
-                        {success && (
-                          <div className='mb-4 rounded bg-green-100 p-3 text-green-700'>
-                            {success}
-                          </div>
-                        )}
-
-                        <label
-                          htmlFor='oldpassword'
-                          className='font-Nova mb-2 mt-4 text-[20px] font-bold capitalize text-gray-600'
-                        >
-                          Enter your old password
-                        </label>
-
-                        <div className='relative flex w-full items-center gap-2 rounded-[5px] border-[2px] border-black bg-transparent px-3'>
-                          <input
-                            onChange={handlePasswordChange}
-                            className='w-full border-none bg-transparent py-2 focus:outline-0 focus:ring-0'
-                            type={viewOldPassword ? 'text' : 'password'}
-                            name='oldPassword'
-                            id='oldpassword'
-                            value={passwordData.oldPassword}
-                          />
-                          {viewOldPassword ? (
-                            <FiEye
-                              aria-label='Show Old Password'
-                              className='cursor-pointer text-xl'
-                              onClick={() => setViewOldPassword(false)}
-                            />
-                          ) : (
-                            <FiEyeOff
-                              aria-label='Hide Old Password'
-                              className='cursor-pointer text-xl'
-                              onClick={() => setViewOldPassword(true)}
-                            />
-                          )}
                         </div>
+                      ) : (
+                        <ForgotPassword
+                          hideForgotPass={() => setshowForgotPass(false)}
+                          email={initialUser.email}
+                        />
+                      )}
+                    </Drawer>
 
-                        <label
-                          htmlFor='newpassword'
-                          className='font-Nova mb-2 mt-4 text-[20px] font-bold capitalize text-gray-600'
-                        >
-                          Create new password
-                        </label>
-
-                        <div className='relative flex w-full items-center gap-2 rounded-[5px] border-[2px] border-black bg-transparent px-3'>
-                          <input
-                            onChange={handlePasswordChange}
-                            className='w-full border-none bg-transparent py-2 focus:outline-0 focus:ring-0'
-                            type={viewNewPassword ? 'text' : 'password'}
-                            name='newPassword'
-                            id='newpassword'
-                            value={passwordData.newPassword}
-                          />
-                          {viewNewPassword ? (
-                            <FiEye
-                              aria-label='Show New Password'
-                              className='cursor-pointer text-xl'
-                              onClick={() => setViewNewPassword(false)}
-                            />
-                          ) : (
-                            <FiEyeOff
-                              aria-label='Hide New Password'
-                              className='cursor-pointer text-xl'
-                              onClick={() => setViewNewPassword(true)}
-                            />
-                          )}
-                        </div>
-
-                        <div className='mt-2 flex w-full justify-end pl-1'>
-                          <p
-                            type='button'
-                            onClick={() => {
-                              setshowForgotPass(true)
-                            }}
-                            className='cursor-pointer text-lg font-semibold text-[#1877f2] hover:underline'
-                          >
-                            Forgotten password?
-                          </p>
-                        </div>
-
-                        <div className='mt-6 flex w-full items-center gap-5'>
-                          <button
-                            onClick={handlePasswordSubmit}
-                            className='rounded bg-black px-4 py-2 text-white transition-colors hover:bg-gray-800'
-                          >
-                            Submit
-                          </button>
-                          <button
-                            onClick={() => {
-                              setPasswordData({
-                                oldPassword: '',
-                                newPassword: ''
-                              })
-                              toggleDrawerPassword()
-                            }}
-                            className='rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600'
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <ForgotPassword
-                      hideForgotPass={() => setshowForgotPass(false)}
-                      email={initialUser.email}
-                    />
-                  )}
-                </Drawer>
-
-                <button
-                  onClick={toggleDrawerPassword}
-                  className='mt-4 w-[40%] rounded bg-black px-4 py-2 text-white transition-colors hover:bg-gray-800'
-                >
-                  Change Password
-                </button>
+                    <button
+                      onClick={toggleDrawerPassword}
+                      className='mt-4 w-[40%] rounded bg-black px-4 py-2 text-white transition-colors hover:bg-gray-800'
+                    >
+                      Change Password
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

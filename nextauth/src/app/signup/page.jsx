@@ -5,6 +5,7 @@ import TextField from '../components/TextField';
 import SignInOrSignUpButton from '../components/SignInOrSignUp';
 import { useState } from 'react';
 import { useSignup } from '../../hooks/useSignup';
+import GithubSignInButton from '../components/GithubSignInButton';
 
 const SignUpPage = () => {
   const { signup, loading, error, success } = useSignup();
@@ -97,6 +98,7 @@ const SignUpPage = () => {
           <div className='flex flex-col gap-4'>
             <SignInOrSignUpButton show={'signin'} />
             <GoogleSignInButton />
+            <GithubSignInButton />
           </div>
         </div>
       </div>
