@@ -9,6 +9,7 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import GithubSignInButton from '../components/GithubSignInButton'
 import { checkEmailExists } from '../../lib/auth_helpers'
 import { useSession } from 'next-auth/react'
+import { getRememberedCredentials } from 'src/lib/rememberme'
 
 const SignInPage = () => {
   const { data: session } = useSession();
@@ -22,6 +23,14 @@ const SignInPage = () => {
   const [error, setError] = useState('')
   const [isEmailValid, setIsEmailValid] = useState(false)
   const [isLoading, setIsLoading] = useState(false) // Add loading state
+
+  useEffect(() => {
+    const rememberedCredentials = getRememberedCredentials()
+    if (rememberedCredentials) {
+      setEmail(rememberedCredentials.email)
+      setIsEmailValid(true)
+    }
+  }, [email])
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault()

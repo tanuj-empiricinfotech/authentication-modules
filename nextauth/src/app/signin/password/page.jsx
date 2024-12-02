@@ -3,39 +3,52 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn, useSession } from 'next-auth/react'
-import Drawer from 'react-modern-drawer'
-import 'react-modern-drawer/dist/index.css'
 import TextField from '../../components/TextField'
 import Button from '../../components/Button'
 import GoogleSignInButton from '../../components/GoogleSignInButton'
 import GithubSignInButton from '../../components/GithubSignInButton'
-import ForgotPassword from '../../profile/component/ForgotPassword'
+import { FiEyeOff } from 'react-icons/fi'
+import { FaEye } from 'react-icons/fa6'
+import {
+  saveRememberedCredentials,
+  clearRememberedCredentials,
+  getRememberedCredentials
+} from '../../../lib/rememberme' // Adjust import path as needed
 
 const PasswordSignInPage = () => {
   const router = useRouter()
-  const { data: session } = useSession();
+  const { data: session } = useSession()
 
-    if (session) {
-      router.push("/"); // Redirect if logged in
-    }
-  
+  if (session) {
+    router.push('/') // Redirect if logged in
+  }
+
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
 
+  // Check for remembered credentials on component mount
   useEffect(() => {
     const emailParam = searchParams.get('email')
+
     if (emailParam) {
       setEmail(emailParam)
+
+      const rememberedCredentials = getRememberedCredentials();
+      if (rememberedCredentials) {
+        setPassword(rememberedCredentials.password)
+        setRememberMe(true)
+      }
     } else {
-      // If no email is provided, redirect back to signin
+      // If no email is provided and no remembered credentials, redirect back to signin
       router.push('/signin')
     }
   }, [searchParams, router])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault()
     setError('')
 
@@ -51,11 +64,22 @@ const PasswordSignInPage = () => {
       if (result?.error) {
         setError(result.error)
       } else if (result?.ok) {
+        // Handle "Remember Me" functionality
+        if (rememberMe) {
+          saveRememberedCredentials(email, password)
+        } else {
+          clearRememberedCredentials()
+        }
+
         router.push('/') // Redirect after successful login
       }
     } catch (err) {
       setError('An unexpected error occurred')
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -65,7 +89,7 @@ const PasswordSignInPage = () => {
           <h1 className='text-center text-2xl font-medium tracking-tight text-gray-900'>
             Enter your password
           </h1>
-          <p className='text-center text-sm text-gray-600 mt-2'>
+          <p className='mt-2 text-center text-sm text-gray-600'>
             Sign in to {email}
           </p>
         </div>
@@ -81,19 +105,52 @@ const PasswordSignInPage = () => {
                 disabled
                 readOnly
               />
-              <TextField
-                id='password'
-                name='password'
-                type='password'
-                label='Password'
-                placeholder='Your password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete='current-password'
-                required
-              />
+
+              <div className='relative flex w-full items-center'>
+                <TextField
+                  id='password'
+                  name='password'
+                  type={showPassword ? 'text' : 'password'}
+                  label='Password'
+                  placeholder='Your password'
+                  value={password}
+                  className={'w-full'}
+                  onChange={e => setPassword(e.target.value)}
+                  autoComplete='current-password'
+                  required
+                  maxLength={20}
+                />
+                <button
+                  type='button'
+                  onClick={togglePasswordVisibility}
+                  className='absolute right-3 top-10 text-gray-500 hover:text-gray-700 focus:outline-none'
+                >
+                  {showPassword ? (
+                    <FiEyeOff className='h-4 w-4' />
+                  ) : (
+                    <FaEye className='h-4 w-4' />
+                  )}
+                </button>
+              </div>
+
+              {/* Remember Me Checkbox */}
+              <div className='mt-2 flex items-center'>
+                <input
+                  id='remember-me'
+                  type='checkbox'
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
+                  className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+                />
+                <label
+                  htmlFor='remember-me'
+                  className='ml-2 block text-sm text-gray-900'
+                >
+                  Remember me
+                </label>
+              </div>
             </div>
-            {error && <p className='text-red-500 mt-2'>{error}</p>}
+            {error && <p className='mt-2 text-red-500'>{error}</p>}
             <Button
               type='submit'
               variant='outline'
@@ -106,7 +163,11 @@ const PasswordSignInPage = () => {
               <button
                 type='button'
                 className='text-sm text-gray-600 hover:text-gray-900'
-                onClick={() => router.push(`/signin/forgot-password?email=${encodeURIComponent(email)}`)}
+                onClick={() =>
+                  router.push(
+                    `/signin/forgot-password?email=${encodeURIComponent(email)}`
+                  )
+                }
               >
                 Forgot password?
               </button>
@@ -121,18 +182,6 @@ const PasswordSignInPage = () => {
           </div>
         </div>
       </div>
-
-      {showForgotPassword && (
-        <Drawer
-          open={showForgotPassword}
-          onClose={() => setShowForgotPassword(false)}
-          direction='right'
-          size={450}
-          className='flex items-center justify-center'
-        >
-          <ForgotPassword hideForgotPass={() => setShowForgotPassword(false)} />
-        </Drawer>
-      )}
     </section>
   )
 }

@@ -6,10 +6,13 @@ import SignInOrSignUpButton from '../components/SignInOrSignUp';
 import { useState } from 'react';
 import { useSignup } from '../../hooks/useSignup';
 import GithubSignInButton from '../components/GithubSignInButton';
+import { FiEyeOff } from 'react-icons/fi';
+import { FaEye } from 'react-icons/fa6';
 
 const SignUpPage = () => {
   const { signup, loading, error, success } = useSignup();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +27,10 @@ const SignUpPage = () => {
       alert('Signup successful!');
       setFormData({ name: '', email: '', password: '' });
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -62,16 +69,30 @@ const SignUpPage = () => {
                 onChange={handleChange}
               />
 
-              <TextField
-                id='password'
-                name='password'
-                type='password'
-                label='Create a strong password'
-                className={''}
-                required
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <div className='relative flex items-center w-full'>
+                <TextField
+                  id='password'
+                  name='password'
+                  type={showPassword ? 'text' : 'password'}
+                  label='Create a strong password'
+                  className={'w-full'}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  maxLength={20}
+                />
+                <button
+                  type='button'
+                  onClick={togglePasswordVisibility}
+                  className='absolute right-3 top-10 text-gray-500 hover:text-gray-700 focus:outline-none'
+                >
+                  {showPassword ? (
+                    <FiEyeOff className='h-4 w-4' />
+                  ) : (
+                    <FaEye className='h-4 w-4' />
+                  )}
+                </button>
+              </div>
             </div>
             <Button
               type='submit'
