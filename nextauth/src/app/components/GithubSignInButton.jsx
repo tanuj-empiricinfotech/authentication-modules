@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react'
 
 export const GithubSignInButton = () => {
     const searchParams = useSearchParams()
-    const callbackUrl = searchParams.get('callbackUrl') || '/'
+    const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   
     return (
       <Button

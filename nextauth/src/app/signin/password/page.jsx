@@ -52,6 +52,10 @@ const PasswordSignInPage = () => {
     e.preventDefault()
     setError('')
 
+
+    console.log(typeof email, email);
+    console.log(typeof password, password);
+
     try {
       const result = await signIn('credentials', {
         email,
@@ -71,7 +75,7 @@ const PasswordSignInPage = () => {
           clearRememberedCredentials()
         }
 
-        router.push('/') // Redirect after successful login
+        router.push('/dashboard') // Redirect after successful login
       }
     } catch (err) {
       setError('An unexpected error occurred')

@@ -10,7 +10,7 @@ import Button from './Button'
 // Google Sign-In Button Component
 export const GoogleSignInButton = () => {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
 
   return (
     <Button

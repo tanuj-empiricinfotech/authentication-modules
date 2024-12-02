@@ -9,7 +9,7 @@ import GoogleSignInButton from '../components/GoogleSignInButton'
 import GithubSignInButton from '../components/GithubSignInButton'
 import { checkEmailExists } from '../../lib/auth_helpers'
 import { useSession } from 'next-auth/react'
-import { getRememberedCredentials } from 'src/lib/rememberme'
+import { getRememberedCredentials } from '@/lib/rememberme'
 
 const SignInPage = () => {
   const { data: session } = useSession();
