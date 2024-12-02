@@ -9,7 +9,7 @@ This repository demonstrates two comprehensive authentication implementations in
 The repository is organized into two main branches, each featuring a distinct authentication implementation:
 
 ### 1. Clerk Authentication Branch (`clerk/auth`)
-![Clerk Authentication](https://media.licdn.com/dms/image/D5612AQHJKVf2i9XXzw/article-cover_image-shrink_600_2000/0/1697159715452?e=2147483647&v=beta&t=w3POH8gXp2o9_h8qYQOu80hrfp22-kXfUJQYLt9Qt7I)
+![Clerk Authentication](https://imgix.cosmicjs.com/9d8bc340-e63d-11ee-b074-b5c8fe3ef189-clerk.webp?w=1200&auto=compress)
 
 #### Key Features:
 - Complete sign-in and sign-up flow
