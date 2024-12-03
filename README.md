@@ -11,11 +11,57 @@ The repository is organized into two main branches, each featuring a distinct au
 ### 1. Clerk Authentication Branch (`clerk/auth`)
 ![Clerk Authentication](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpGyGJjtCLUjLuqETtVNOEezMt6HGKMwkB1A&s)
 
-#### Key Features:
-- Complete sign-in and sign-up flow
-- Forgot password functionality
+##  Authentication Features
+
+### Sign-In & Sign-Up Flow
+- Complete authentication workflow with multiple login options
+- Email and password authentication
+- Social login with Google integration
+- Secure and intuitive user registration process
+
+### Authentication Methods
+- Email/Password Login
+- Google OAuth Sign-In
 - One-Time Password (OTP) authentication via email
-- Secure and streamlined authentication process
+- Passwordless login options
+
+##  Security Features
+
+### Account Protection
+- Forgot password functionality
+- Secure password reset mechanism
+
+### Device Management
+- Active device tracking
+- Comprehensive device information display:
+  - Login timestamp
+  - Browser type
+  - Device location (city)
+  - IP address tracking
+- Sign out from all devices option
+
+##  Profile Management
+
+### Profile Customization
+- Username modification
+- Profile image upload and update
+- Email address changes
+- Personal information editing
+
+### Security Settings
+- Password update functionality
+- Current password verification for security changes
+- Account deletion option with confirmation process
+
+### Technologies Used
+- Next.js
+- Clerk Authentication
+- React
+- TypeScript
+
+##  Additional Features
+- Responsive authentication interfaces
+- Accessible design for various user needs
 
 ### 2. NextAuth Authentication Branch (`next/auth`)
 ![NextAuth Authentication](https://avatars.githubusercontent.com/u/67470890?s=200&v=4)
